@@ -13,7 +13,7 @@ token="YOUR TOKEN"
 OPENAI_API_KEY="MONGO DB URI [Only required for commands which requires some data to store]"
 ```
 - Save the file. Open Terminal in the Project Directory.
-- THhead to `Line 82: index.js`.
+- Head to `Line 82: index.js`.
 - Enter the Channel ID
 - Run:
 ```
