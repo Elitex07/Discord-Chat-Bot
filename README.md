@@ -10,7 +10,7 @@ This is an example Discord Chat Bot based on Open Ai and Discord.js Library. Enj
 - Enter the following details to it:
 ```
 token="YOUR TOKEN"
-OPENAI_API_KEY="MONGO DB URI [Only required for commands which requires some data to store]"
+OPENAI_API_KEY="API KEY"
 ```
 - Save the file. Open Terminal in the Project Directory.
 - Head to `Line 82: index.js`.
