@@ -1,5 +1,7 @@
 const {Client, Collection, GatewayIntentBits, Partials, EmbedBuilder, PermissionsBitField} = require('discord.js');
 require('dotenv').config();
+const collection = new Map();
+require('colors');
 
 // Initialzing Client
 const client = new Client({
@@ -77,7 +79,7 @@ Raiden: Nothing much. You?\n\
 client.on('messageCreate', async message => {
     if(message.author.bot) return;
     try{
-        if(message.channel.id == 'channel-id') { // Channel ID in Discord
+        if(message.channel.id == '1034783293859704844') { // Channel ID in Discord
                 collection.forEach((value, key) => {
                     let l = value[value.length - 1]
                     if(Date.now() - l[0] >= 60*1000) collection.delete(key)
