@@ -6,41 +6,18 @@ require('colors');
 // Initialzing Client
 const client = new Client({
     intents: [
+        GatewayIntentBits.MessageContent,
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.DirectMessageReactions,
-        GatewayIntentBits.DirectMessageTyping,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.GuildBans,
-        GatewayIntentBits.GuildEmojisAndStickers,
-        GatewayIntentBits.GuildIntegrations,
-        GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildMessageTyping,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildScheduledEvents,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildWebhooks,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.GuildMessages
     ],
-    partials: [
-        Partials.Channel,
-        Partials.Message,
-        Partials.GuildMember,
-        Partials.GuildScheduledEvent,
-        Partials.Reaction,
-        Partials.ThreadMember,
-        Partials.User
-    ],
-    presence: {
-        activities: [{name: `Raiden Chat Bot`, type: 0}],
-        status: "online"
-    },
     allowedMentions:{
         repliedUser: false,
         parse: ['users','roles','everyone']
-    }
+    },
+    presence: {
+        activities: [{name: `/help | Raiden ChatBot`, type: 0}],
+        status: "idle"
+    },
 });
 
 // Crash - Prevention
@@ -65,15 +42,13 @@ const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-let prompt = `Raiden is a utility bot which can perform various taks:\n\
-You: What does HTML stand for?\n\
-Raiden: Hypertext Markup Language.\n\
-You: When did the first airplane fly?\n\
-Raiden: On December 17, 1903, Wilbur and Orville Wright made the first flights.\n\
-You: What is the meaning of life?\n\
-Raiden: I'm not sure. You should ask my friend Google.\n\
-You: hey whats up?\n\
-Raiden: Nothing much. You?\n\
+let prompt = `The following is a conversation with a Discord bot Raiden. Raiden is creative, clever, helpful and very friendly.\n\
+
+You: Hello, who are you?
+AI: Hey, I am Raiden. I was created by Elitex, he is cool programmer. I was made on 21 Novemeber, 2021. My Support Server and Community Server Link: https://discord.gg/raidenbot . My website link: https://raidenbot.xyz
+
+You: Who is Elitex?
+AI: Elitex is a my developer. He solely developes my each and every feature. He has some public repo's at https://github.com/Elitex07. He works alone on me, he has team of bug testers to test or confirm Bugs.
 `;
 
 client.on('messageCreate', async message => {
@@ -85,6 +60,7 @@ client.on('messageCreate', async message => {
                     if(Date.now() - l[0] >= 60*1000) collection.delete(key)
                 });
                 if(!message.channel.permissionsFor(client.user.id).has(PermissionsBitField.Flags.SendMessages)) return;
+                if(message.type != 0 || ![0 , 5, 10, 11, 12].includes(message.channel.type)) return; //Ignores other types of message and replies
                 message.channel.sendTyping();
 
                 if(!collection.has(message.author.id)){
@@ -97,35 +73,48 @@ client.on('messageCreate', async message => {
 
                 let prev = '';
                 await userm.forEach(async d => {
-                    let userline = `You: ${d[1]}\n\ `;
-                    let botline = userline.concat(`Raiden: ${d[2]}\n\n\ `);
+                    let userline = `${message.member.displayName}: ${d[1]}\n\ `;
+                    let botline = userline.concat(`AI: ${d[2]}\n\n\ `);
                     prev = prev.concat(botline);
                 });
 
-                let b = prompt.concat(prev).concat(`You: ${message.cleanContent}\n\ `);
+                let b = prompt.concat(prev).concat(`${message.member.displayName}: ${message.cleanContent}\n\ `).replace(/You/g,`${message.member.displayName}`);
+                console.log(b)
                 
-    
                 const openai = new OpenAIApi(configuration);
+                var err = false;
                 const response = await openai.createCompletion({
                     model: "text-davinci-002",
                     prompt: b,
                     temperature: 0.1,
-                    max_tokens: 60,
-                    top_p: 0.3,
-                    frequency_penalty: 0.5,
-                    presence_penalty: 0.0,
-                }).catch(e => console.log(`${e}`.red));
+                    max_tokens: 250,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0.6,
+                }).catch(e => {
+                    console.log(`${e}`.red);
+                    err = true
+                });
 
-                message.reply({content: `${response.data.choices[0].text.split(':')[1]?response.data.choices[0].text.split(':')[1]:response.data.choices[0].text}`, allowedMentions: {repliedUser: false}}).catch(e => message.reply(`_ _`).catch(e => null));
-                
-                userm.push([Date.now(), message.cleanContent.slice(0, 1020), `${response.data.choices[0].text.split(':')[1]?response.data.choices[0].text.split(':')[1]:response.data.choices[0].text}`]);
-                collection.set(message.author.id, userm);
-                
+                if(err) return;
+
+                let reply = response.data.choices[0].text;
+                if(reply.includes('AI:')) reply = reply.split('AI:')[1];
+                if(reply.endsWith(`${message.member.displayName}`)) reply = reply.slice(-message.member.displayName.length, 0);
+
+                message.reply({content: reply, allowedMentions: {repliedUser: false}, flags:MessageFlagsBitField.Flags.SuppressEmbeds})
+                .catch(async e => {
+                    err = true
+                });
+
+                if(err) return;
+
+                 userm.push([Date.now(), message.cleanContent.slice(0, 100), `${reply}`]);
+                collection.set(message.author.id, userm);                
                 return;
         }
     } catch(e){
         console.log(`[AI-Chat] ${e}`.red);
-        message.channel.send('API is down.');
     }
 });
 
