@@ -13,7 +13,7 @@ token="YOUR TOKEN"
 OPENAI_API_KEY="API KEY"
 ```
 - Save the file. Open Terminal in the Project Directory.
-- Head to `Line 82: index.js`.
+- Head to `Line 57: index.js`.
 - Enter the Channel ID
 - Run:
 ```
@@ -23,12 +23,12 @@ node index.js
 - You are done.
 
 ## Configuration
-- To change chat channel, head to `Line 82: index.js`.
+- To change chat channel, head to `Line 57: index.js`.
 - Change the Channel ID
 
 ## Support
 Join one of these Discord Servers, to get support:
 
-[<img src="https://discordapp.com/api/guilds/890225986375929866/widget.png?style=banner2" alt="Discord Banner 1"/>](https://discord.gg/2SEEZ86pyj)
+[<img src="https://discordapp.com/api/guilds/890225986375929866/widget.png?style=banner2" alt="Discord Banner 1"/>](https://discord.gg/UN7YBb23tu)
 
 [<img src="https://discordapp.com/api/guilds/789443193989103648/widget.png?style=banner2" alt="Discord Banner 1"/>](https://discord.gg/TvjrWtEuyP)
