@@ -84,7 +84,7 @@ client.on('messageCreate', async message => {
                 const openai = new OpenAIApi(configuration);
                 var err = false;
                 const response = await openai.createCompletion({
-                    model: "text-davinci-002",
+                    model: "text-davinci-003",
                     prompt: b,
                     temperature: 0.1,
                     max_tokens: 250,
